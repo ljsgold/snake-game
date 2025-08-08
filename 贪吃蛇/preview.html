@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇游戏 - 预览</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            color: #fff;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        h1 {
+            color: #4CAF50;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 1rem;
+            margin: 2rem 0;
+        }
+        .link {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-size: 1.2rem;
+            margin: 1rem;
+            transition: all 0.3s ease;
+        }
+        .link:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            text-align: left;
+        }
+        .feature h3 {
+            color: #4CAF50;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐍 贪吃蛇游戏</h1>
+        
+        <div class="status">
+            <h2>🎮 游戏状态</h2>
+            <p>服务器已启动，游戏可以正常访问！</p>
+            <a href="http://localhost:8000" class="link">🎯 开始游戏</a>
+        </div>
+
+        <div class="feature">
+            <h3>📱 移动端支持</h3>
+            <p>游戏完全支持手机和平板设备，自动检测设备类型并显示相应的控制方式。</p>
+        </div>
+
+        <div class="feature">
+            <h3>🎨 现代化设计</h3>
+            <p>美观的深色主题，流畅的动画效果，蛇头有眼睛，食物有光晕效果。</p>
+        </div>
+
+        <div class="feature">
+            <h3>🔗 分享功能</h3>
+            <p>内置分享功能，支持移动端原生分享API，一键分享给朋友。</p>
+        </div>
+
+        <div class="feature">
+            <h3>⚡ 性能优化</h3>
+            <p>响应式设计，自适应画布大小，触摸事件优化，防止误触和缩放。</p>
+        </div>
+
+        <div class="status">
+            <h2>🚀 快速开始</h2>
+            <p>点击下面的按钮开始游戏，或者直接访问：</p>
+            <p><strong>http://localhost:8000</strong></p>
+            <a href="http://localhost:8000" class="link">🎮 立即开始</a>
+        </div>
+
+        <div class="feature">
+            <h3>📋 游戏控制</h3>
+            <p><strong>PC端：</strong>使用方向键或WASD控制蛇的移动，空格键暂停</p>
+            <p><strong>移动端：</strong>使用屏幕下方的方向按钮控制</p>
+        </div>
+    </div>
+</body>
+</html>

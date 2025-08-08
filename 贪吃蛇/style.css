@@ -1,0 +1,247 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+.game-container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    position: relative;
+    max-width: 100vw;
+    max-height: 100vh;
+}
+
+.game-header {
+    margin-bottom: 1.5rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #4CAF50;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.score-container {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+#gameCanvas {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    max-width: 100%;
+    height: auto;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: #4CAF50;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+button:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+    background: #3d8b40;
+}
+
+.mobile-controls {
+    display: none;
+    margin-top: 1rem;
+}
+
+.control-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.control-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    background: rgba(76, 175, 80, 0.8);
+    border: 2px solid #4CAF50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+}
+
+.control-btn:active {
+    background: #45a049;
+    transform: scale(0.95);
+}
+
+.game-over {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 2rem;
+    border-radius: 1rem;
+    text-align: center;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.game-over h2 {
+    color: #ff4444;
+    margin-bottom: 1rem;
+}
+
+.game-over p {
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .game-container {
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    button {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .mobile-controls {
+        display: block;
+    }
+
+    #gameCanvas {
+        width: 100%;
+        max-width: 350px;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        padding: 0.5rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .score-container {
+        font-size: 1.2rem;
+    }
+
+    .control-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+}
+
+.share-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.share-content {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 1rem;
+    max-width: 90%;
+    max-height: 80%;
+    overflow-y: auto;
+    color: #333;
+}
+
+.share-content h3 {
+    margin-bottom: 1rem;
+    color: #4CAF50;
+}
+
+.share-content textarea {
+    width: 100%;
+    height: 150px;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    font-family: monospace;
+    resize: vertical;
+}
+
+.share-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.share-buttons button {
+    padding: 0.5rem 1rem;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.share-buttons button:hover {
+    background: #45a049;
+} 
