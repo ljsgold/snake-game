@@ -1,0 +1,18 @@
+{
+  "name": "snake-game",
+  "version": "1.0.0",
+  "description": "一个现代化的贪吃蛇游戏，支持PC和移动端",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "build": "echo '游戏已构建完成'"
+  },
+  "keywords": ["game", "snake", "html5", "canvas", "mobile"],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/snake-game.git"
+  }
+}
