@@ -367,4 +367,185 @@ class Snake {
         this.isGameOver = false;
         document.getElementById('score').textContent = '0';
         document.getElementById('gameOver').style.display = 'none';
-        document.getElementById('startBtn
+        document.getElementById('startBtn').style.display = 'block';
+        document.getElementById('pauseBtn').textContent = '暂停';
+        clearInterval(this.gameLoop);
+        this.gameLoop = null;
+        this.draw();
+    }
+
+    shareGame() {
+        const shareData = {
+            title: '贪吃蛇游戏',
+            text: '来玩这个超好玩的贪吃蛇游戏吧！我的最高分是 ' + this.score + ' 分！',
+            url: window.location.href
+        };
+
+        if (navigator.share && this.isMobile) {
+            // 移动端使用原生分享API
+            navigator.share(shareData).catch(err => {
+                this.fallbackShare();
+            });
+        } else {
+            this.fallbackShare();
+        }
+    }
+
+    fallbackShare() {
+        // 复制链接到剪贴板
+        const url = window.location.href;
+        const shareText = `🎮 贪吃蛇游戏\n\n来玩这个超好玩的贪吃蛇游戏吧！\n我的最高分是 ${this.score} 分！\n\n游戏链接：${url}`;
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('游戏链接已复制到剪贴板！\n\n分享文本：\n' + shareText);
+            }).catch(() => {
+                this.showShareDialog(shareText);
+            });
+        } else {
+            this.showShareDialog(shareText);
+        }
+    }
+
+    showShareDialog(shareText) {
+        const dialog = document.createElement('div');
+        dialog.className = 'share-dialog';
+        dialog.innerHTML = `
+            <div class="share-content">
+                <h3>分享游戏</h3>
+                <p>复制以下内容分享给朋友：</p>
+                <textarea readonly>${shareText}</textarea>
+                <div class="share-buttons">
+                    <button onclick="navigator.clipboard.writeText(this.previousElementSibling.value).then(() => alert('已复制到剪贴板！'))">复制文本</button>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()">关闭</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+    }
+}
+
+// 初始化游戏
+const initGame = () => {
+    try {
+        const canvas = document.getElementById('gameCanvas');
+        if (!canvas) {
+            throw new Error('Canvas element not found');
+        }
+        
+        // 检查Canvas API支持
+        if (!canvas.getContext) {
+            throw new Error('Canvas API not supported');
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            throw new Error('2D context not supported');
+        }
+        
+        const game = new Snake(canvas);
+        game.draw();
+        
+        // 添加加载完成提示
+        console.log('贪吃蛇游戏已加载完成！');
+        
+        // 在移动端显示简化的提示
+        if (game.isMobile) {
+            setTimeout(() => {
+                try {
+                    // 使用更友好的提示方式
+                    const welcomeDiv = document.createElement('div');
+                    welcomeDiv.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background: rgba(76, 175, 80, 0.9);
+                        color: white;
+                        padding: 10px 20px;
+                        border-radius: 20px;
+                        text-align: center;
+                        z-index: 1000;
+                        font-size: 14px;
+                        animation: fadeInOut 3s ease-in-out;
+                    `;
+                    welcomeDiv.innerHTML = '🎮 使用下方按钮控制蛇的移动';
+                    document.body.appendChild(welcomeDiv);
+                    
+                    // 3秒后自动移除提示
+                    setTimeout(() => {
+                        if (welcomeDiv.parentNode) {
+                            welcomeDiv.parentNode.removeChild(welcomeDiv);
+                        }
+                    }, 3000);
+                } catch (alertError) {
+                    console.log('🎮 游戏已就绪！使用下方按钮控制蛇的移动。');
+                }
+            }, 1000);
+        }
+        
+        return game;
+    } catch (error) {
+        console.error('游戏初始化失败:', error);
+        showErrorMessage(error.message);
+        return null;
+    }
+};
+
+const showErrorMessage = (errorDetails) => {
+    const errorMessage = document.createElement('div');
+    errorMessage.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 0, 0, 0.95);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        z-index: 9999;
+        max-width: 90%;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    `;
+    errorMessage.innerHTML = `
+        <h3 style="margin-top: 0; color: #ffebee;">🚫 游戏加载失败</h3>
+        <p style="margin: 15px 0; font-size: 14px;">请尝试以下解决方案：</p>
+        <ul style="text-align: left; margin: 15px 0; padding-left: 20px; font-size: 13px;">
+            <li>刷新页面重试</li>
+            <li>清除浏览器缓存</li>
+            <li>使用Chrome、Safari或Firefox浏览器</li>
+            <li>确保开启了JavaScript</li>
+            <li>检查网络连接</li>
+        </ul>
+        <div style="margin-top: 20px;">
+            <button onclick="location.reload()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 5px;">🔄 刷新页面</button>
+            <button onclick="this.parentElement.parentElement.remove()" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 5px;">关闭</button>
+        </div>
+        <p style="font-size: 11px; color: #ffcdd2; margin-top: 15px;">错误详情: ${errorDetails}</p>
+    `;
+    document.body.appendChild(errorMessage);
+};
+
+// 添加CSS动画
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    }
+`;
+document.head.appendChild(style);
+
+// 等待DOM完全加载
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGame);
+} else {
+    initGame();
+}
+
+// 兼容旧式加载方式
+window.onload = initGame;
