@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>手机端调试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        .debug-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .status {
+            padding: 5px 0;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #ff4444; }
+        .warning { color: #ff9800; }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 GitHub Pages 移动端调试</h1>
+    
+    <div class="debug-info">
+        <h3>📱 设备信息</h3>
+        <div class="status">用户代理: <span id="userAgent"></span></div>
+        <div class="status">屏幕尺寸: <span id="screenInfo"></span></div>
+        <div class="status">视口尺寸: <span id="viewportInfo"></span></div>
+        <div class="status">设备像素比: <span id="pixelRatio"></span></div>
+    </div>
+
+    <div class="debug-info">
+        <h3>🌐 网络和位置信息</h3>
+        <div class="status">当前URL: <span id="currentUrl"></span></div>
+        <div class="status">协议: <span id="protocol"></span></div>
+        <div class="status">主机: <span id="hostname"></span></div>
+    </div>
+
+    <div class="debug-info">
+        <h3>🔍 JavaScript API 检测</h3>
+        <div class="status">Canvas API: <span id="canvasSupport"></span></div>
+        <div class="status">Touch Events: <span id="touchSupport"></span></div>
+        <div class="status">Local Storage: <span id="storageSupport"></span></div>
+        <div class="status">Geolocation: <span id="geoSupport"></span></div>
+    </div>
+
+    <div class="debug-info">
+        <h3>📁 资源加载测试</h3>
+        <div class="status">CSS 文件: <span id="cssStatus">检测中...</span></div>
+        <div class="status">JS 文件: <span id="jsStatus">检测中...</span></div>
+    </div>
+
+    <div class="debug-info">
+        <h3>⚡ 操作测试</h3>
+        <button onclick="testTouch()">测试触摸</button>
+        <button onclick="testCanvas()">测试Canvas</button>
+        <button onclick="goToMainGame()">打开主游戏</button>
+        <div class="status" id="testResults">等待测试...</div>
+    </div>
+
+    <canvas id="testCanvas" width="200" height="100" style="border: 1px solid #4CAF50; margin: 10px 0;"></canvas>
+
+    <script>
+        // 设备信息检测
+        function detectDeviceInfo() {
+            document.getElementById('userAgent').textContent = navigator.userAgent;
+            document.getElementById('screenInfo').textContent = `${screen.width} × ${screen.height}`;
+            document.getElementById('viewportInfo').textContent = `${window.innerWidth} × ${window.innerHeight}`;
+            document.getElementById('pixelRatio').textContent = window.devicePixelRatio || '未知';
+            
+            document.getElementById('currentUrl').textContent = window.location.href;
+            document.getElementById('protocol').textContent = window.location.protocol;
+            document.getElementById('hostname').textContent = window.location.hostname;
+        }
+
+        // API 支持检测
+        function detectAPISupport() {
+            // Canvas
+            const canvas = document.createElement('canvas');
+            const canvasSupported = canvas.getContext && canvas.getContext('2d');
+            document.getElementById('canvasSupport').innerHTML = canvasSupported ? 
+                '<span class="success">✅ 支持</span>' : '<span class="error">❌ 不支持</span>';
+
+            // Touch Events
+            const touchSupported = 'ontouchstart' in window;
+            document.getElementById('touchSupport').innerHTML = touchSupported ? 
+                '<span class="success">✅ 支持</span>' : '<span class="warning">⚠️ 不支持</span>';
+
+            // Local Storage
+            const storageSupported = typeof(Storage) !== "undefined";
+            document.getElementById('storageSupport').innerHTML = storageSupported ? 
+                '<span class="success">✅ 支持</span>' : '<span class="error">❌ 不支持</span>';
+
+            // Geolocation
+            const geoSupported = "geolocation" in navigator;
+            document.getElementById('geoSupport').innerHTML = geoSupported ? 
+                '<span class="success">✅ 支持</span>' : '<span class="warning">⚠️ 不支持</span>';
+        }
+
+        // 资源加载测试
+        function testResourceLoading() {
+            // 测试 CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = './style.css';
+            link.onload = () => {
+                document.getElementById('cssStatus').innerHTML = '<span class="success">✅ 加载成功</span>';
+            };
+            link.onerror = () => {
+                document.getElementById('cssStatus').innerHTML = '<span class="error">❌ 加载失败</span>';
+            };
+            document.head.appendChild(link);
+
+            // 测试 JS
+            const script = document.createElement('script');
+            script.src = './script.js';
+            script.onload = () => {
+                document.getElementById('jsStatus').innerHTML = '<span class="success">✅ 加载成功</span>';
+            };
+            script.onerror = () => {
+                document.getElementById('jsStatus').innerHTML = '<span class="error">❌ 加载失败</span>';
+            };
+            document.head.appendChild(script);
+        }
+
+        // 触摸测试
+        function testTouch() {
+            document.getElementById('testResults').innerHTML = '👆 请触摸屏幕测试...';
+            
+            let touchDetected = false;
+            const testElement = document.body;
+            
+            const handleTouch = (e) => {
+                touchDetected = true;
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+                document.getElementById('testResults').innerHTML = 
+                    `<span class="success">✅ 触摸成功！坐标: (${Math.round(x)}, ${Math.round(y)})</span>`;
+                
+                testElement.removeEventListener('touchstart', handleTouch);
+                testElement.removeEventListener('click', handleTouch);
+            };
+            
+            testElement.addEventListener('touchstart', handleTouch, { passive: false });
+            testElement.addEventListener('click', handleTouch);
+            
+            setTimeout(() => {
+                if (!touchDetected) {
+                    document.getElementById('testResults').innerHTML = 
+                        '<span class="error">❌ 触摸测试超时</span>';
+                }
+            }, 5000);
+        }
+
+        // Canvas测试
+        function testCanvas() {
+            const canvas = document.getElementById('testCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            try {
+                ctx.fillStyle = '#4CAF50';
+                ctx.fillRect(10, 10, 80, 80);
+                ctx.fillStyle = '#ff4444';
+                ctx.beginPath();
+                ctx.arc(50, 50, 20, 0, Math.PI * 2);
+                ctx.fill();
+                
+                document.getElementById('testResults').innerHTML = 
+                    '<span class="success">✅ Canvas渲染成功！</span>';
+            } catch (error) {
+                document.getElementById('testResults').innerHTML = 
+                    `<span class="error">❌ Canvas错误: ${error.message}</span>`;
+            }
+        }
+
+        // 跳转到主游戏
+        function goToMainGame() {
+            window.location.href = './index.html';
+        }
+
+        // 页面加载完成后执行检测
+        window.onload = function() {
+            detectDeviceInfo();
+            detectAPISupport();
+            testResourceLoading();
+            
+            // 自动进行Canvas测试
+            setTimeout(testCanvas, 1000);
+        };
+    </script>
+</body>
+</html>
