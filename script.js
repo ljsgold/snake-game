@@ -25,11 +25,36 @@ class Snake {
     }
 
     setCanvasSize() {
-        const maxSize = Math.min(window.innerWidth - 100, window.innerHeight - 300);
-        const size = Math.min(maxSize, 400);
-        this.canvas.width = size;
-        this.canvas.height = size;
-        this.gridSize = Math.floor(size / 20);
+        try {
+            if (this.isMobile) {
+                // 移动端优化
+                const vw = Math.min(window.innerWidth, window.screen.width);
+                const vh = Math.min(window.innerHeight, window.screen.height);
+                const maxSize = Math.min(vw * 0.9, vh * 0.5);
+                const size = Math.min(maxSize, 350);
+                this.canvas.width = size;
+                this.canvas.height = size;
+                this.gridSize = Math.floor(size / 18);
+            } else {
+                // 桌面端
+                const maxSize = Math.min(window.innerWidth - 100, window.innerHeight - 300);
+                const size = Math.min(maxSize, 400);
+                this.canvas.width = size;
+                this.canvas.height = size;
+                this.gridSize = Math.floor(size / 20);
+            }
+            
+            // 确保网格大小至少为10
+            if (this.gridSize < 10) {
+                this.gridSize = 10;
+            }
+        } catch (error) {
+            console.error('设置画布大小失败:', error);
+            // 使用默认大小
+            this.canvas.width = this.isMobile ? 300 : 400;
+            this.canvas.height = this.isMobile ? 300 : 400;
+            this.gridSize = this.isMobile ? 15 : 20;
+        }
     }
 
     bindEvents() {
@@ -70,10 +95,15 @@ class Snake {
         }
 
         // 按钮控制
-        document.getElementById('startBtn').addEventListener('click', () => this.start());
-        document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
-        document.getElementById('restartBtn').addEventListener('click', () => this.restart());
-        document.getElementById('shareBtn').addEventListener('click', () => this.shareGame());
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const shareBtn = document.getElementById('shareBtn');
+
+        if (startBtn) startBtn.addEventListener('click', () => this.start());
+        if (pauseBtn) pauseBtn.addEventListener('click', () => this.togglePause());
+        if (restartBtn) restartBtn.addEventListener('click', () => this.restart());
+        if (shareBtn) shareBtn.addEventListener('click', () => this.shareGame());
 
         // 窗口大小改变时重新设置画布
         window.addEventListener('resize', () => {
@@ -83,37 +113,60 @@ class Snake {
     }
 
     bindTouchControls() {
-        const upBtn = document.getElementById('upBtn');
-        const downBtn = document.getElementById('downBtn');
-        const leftBtn = document.getElementById('leftBtn');
-        const rightBtn = document.getElementById('rightBtn');
+        try {
+            const buttons = [
+                { id: 'upBtn', direction: 'up', blocked: 'down' },
+                { id: 'downBtn', direction: 'down', blocked: 'up' },
+                { id: 'leftBtn', direction: 'left', blocked: 'right' },
+                { id: 'rightBtn', direction: 'right', blocked: 'left' }
+            ];
 
-        upBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (this.direction !== 'down') this.direction = 'up';
-        });
+            buttons.forEach(btn => {
+                const element = document.getElementById(btn.id);
+                if (element) {
+                    // 同时绑定 touchstart 和 click 事件以提高兼容性
+                    const handleDirection = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (this.direction !== btn.blocked && !this.isGameOver) {
+                            this.direction = btn.direction;
+                        }
+                    };
 
-        downBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (this.direction !== 'up') this.direction = 'down';
-        });
+                    element.addEventListener('touchstart', handleDirection, { passive: false });
+                    element.addEventListener('click', handleDirection);
+                    
+                    // 防止默认行为
+                    element.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                    }, { passive: false });
+                }
+            });
 
-        leftBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (this.direction !== 'right') this.direction = 'left';
-        });
+            // 防止页面滚动和缩放
+            document.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
 
-        rightBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (this.direction !== 'left') this.direction = 'right';
-        });
-
-        // 防止双击缩放
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1) {
+            document.addEventListener('touchmove', (e) => {
                 e.preventDefault();
-            }
-        }, { passive: false });
+            }, { passive: false });
+
+            // 防止双击缩放
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, { passive: false });
+
+        } catch (error) {
+            console.error('绑定触摸控制失败:', error);
+        }
     }
 
     generateFood() {
@@ -314,86 +367,4 @@ class Snake {
         this.isGameOver = false;
         document.getElementById('score').textContent = '0';
         document.getElementById('gameOver').style.display = 'none';
-        document.getElementById('startBtn').style.display = 'block';
-        document.getElementById('pauseBtn').textContent = '暂停';
-        clearInterval(this.gameLoop);
-        this.gameLoop = null;
-        this.draw();
-    }
-
-    shareGame() {
-        const shareData = {
-            title: '贪吃蛇游戏',
-            text: '来玩这个超好玩的贪吃蛇游戏吧！我的最高分是 ' + this.score + ' 分！',
-            url: window.location.href
-        };
-
-        if (navigator.share && this.isMobile) {
-            // 移动端使用原生分享API
-            navigator.share(shareData).catch(err => {
-                this.fallbackShare();
-            });
-        } else {
-            this.fallbackShare();
-        }
-    }
-
-    fallbackShare() {
-        // 复制链接到剪贴板
-        const url = window.location.href;
-        const shareText = `🎮 贪吃蛇游戏\n\n来玩这个超好玩的贪吃蛇游戏吧！\n我的最高分是 ${this.score} 分！\n\n游戏链接：${url}`;
-        
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(shareText).then(() => {
-                alert('游戏链接已复制到剪贴板！\n\n分享文本：\n' + shareText);
-            }).catch(() => {
-                this.showShareDialog(shareText);
-            });
-        } else {
-            this.showShareDialog(shareText);
-        }
-    }
-
-    showShareDialog(shareText) {
-        const dialog = document.createElement('div');
-        dialog.className = 'share-dialog';
-        dialog.innerHTML = `
-            <div class="share-content">
-                <h3>分享游戏</h3>
-                <p>复制以下内容分享给朋友：</p>
-                <textarea readonly>${shareText}</textarea>
-                <div class="share-buttons">
-                    <button onclick="navigator.clipboard.writeText(this.previousElementSibling.value).then(() => alert('已复制到剪贴板！'))">复制文本</button>
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()">关闭</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(dialog);
-    }
-}
-
-// 初始化游戏
-window.onload = () => {
-    try {
-        const canvas = document.getElementById('gameCanvas');
-        if (!canvas) {
-            throw new Error('Canvas element not found');
-        }
-        
-        const game = new Snake(canvas);
-        game.draw();
-        
-        // 添加加载完成提示
-        console.log('贪吃蛇游戏已加载完成！');
-        
-        // 在移动端显示提示
-        if (game.isMobile) {
-            setTimeout(() => {
-                alert('欢迎来到贪吃蛇游戏！\n\n使用屏幕下方的方向按钮控制蛇的移动。\n点击"开始游戏"开始游戏！');
-            }, 500);
-        }
-    } catch (error) {
-        console.error('游戏初始化失败:', error);
-        alert('游戏加载失败，请刷新页面重试。');
-    }
-};
+        document.getElementById('startBtn
